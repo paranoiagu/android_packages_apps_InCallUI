@@ -39,6 +39,9 @@ import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 
 import java.util.Locale;
 
+import com.sudamod.sdk.phonelocation.PhoneUtil;
+import android.suda.utils.SudaUtils; 
+
 /**
  * Looks up caller information for the given phone number.
  *
@@ -501,6 +504,9 @@ public class CallerInfo {
      */
     private static String getGeoDescription(Context context, String number) {
         Log.v(TAG, "getGeoDescription('" + number + "')...");
+
+        if(SudaUtils.isSupportLanguage(true))
+            return PhoneUtil.getPhoneUtil(context).getLocalNumberInfo(number, false);
 
         if (TextUtils.isEmpty(number)) {
             return null;

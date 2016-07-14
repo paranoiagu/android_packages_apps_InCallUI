@@ -58,6 +58,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import com.sudamod.sdk.phonelocation.PhoneUtil;
+import android.suda.utils.SudaUtils;
+
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.HashMap;
@@ -78,7 +81,7 @@ public class ContactInfoCache implements ContactsAsyncHelper.OnImageLoadComplete
     private static final String TAG = ContactInfoCache.class.getSimpleName();
     private static final int TOKEN_UPDATE_PHOTO_FOR_CALL_STATE = 0;
 
-    private final Context mContext;
+    private static Context mContext;
     private final PhoneNumberService mPhoneNumberService;
     private final CachedNumberLookupService mCachedNumberLookupService;
     private final LookupProvider mLookupProvider;
@@ -91,6 +94,7 @@ public class ContactInfoCache implements ContactsAsyncHelper.OnImageLoadComplete
 
     private Drawable mDefaultContactPhotoDrawable;
     private Drawable mConferencePhotoDrawable;
+
 
     public static synchronized ContactInfoCache getInstance(Context mContext) {
         if (sCache == null) {
@@ -702,7 +706,13 @@ public class ContactInfoCache implements ContactsAsyncHelper.OnImageLoadComplete
 
         cce.name = displayName;
         cce.number = displayNumber;
-        cce.location = displayLocation;
+        String location = PhoneUtil.getPhoneUtil(mContext).getLocalNumberInfo(cce.number, false);
+        if (!TextUtils.isEmpty(location)) {
+            info.geoDescription = location;
+            cce.location = info.geoDescription;
+        } else {
+            cce.location = displayLocation;
+        }
         cce.label = label;
         cce.isSipCall = isSipCall;
         cce.isEmergencyNumber = info.isEmergencyNumber();
